@@ -1,6 +1,7 @@
 'use client'
 
 import { BookOpen, HeartHandshake, Scale, ShieldCheck, Sparkles, Users } from 'lucide-react'
+import type { ReactNode } from 'react'
 
 const fields = [
   ['Life', 'Receive, order, and care for what has been given.'],
@@ -12,38 +13,17 @@ const fields = [
   ['Trust', 'Keep your word, repair, develop others, create continuity.'],
 ]
 
-const scripture = [
-  ['Love God', 'Deuteronomy 6:5'],
-  ['Love your neighbor', 'Matthew 22:39'],
-  ['Be faithful with little', 'Luke 16:10'],
-  ['Give what you received', 'Matthew 10:8'],
-  ['Keep your word', 'Matthew 5:37'],
-  ['Work faithfully', 'Colossians 3:23'],
-]
+const scripture = [['Love God', 'Deuteronomy 6:5'], ['Love your neighbor', 'Matthew 22:39'], ['Be faithful with little', 'Luke 16:10'], ['Give what you received', 'Matthew 10:8'], ['Keep your word', 'Matthew 5:37'], ['Work faithfully', 'Colossians 3:23']]
 
 export function JourneyDashboard({ focus, moments, encounters }: { focus: string; moments: number; encounters: number }) {
   return <>
-    <section className="grid gap-5 py-10 md:grid-cols-2 lg:grid-cols-4">
-      <Card label="Direction" value={focus ? 'Clear' : 'Developing'} text={focus || 'Begin by noticing where you are.'} />
-      <Card label="Formation" value={`${encounters} encounters`} text="Learning becomes capability through practice and reflection." />
-      <Card label="Reflection" value={`${moments} moments`} text="Noticing creates evidence from which wise action can begin." />
-      <Card label="Next question" value="Contribution" text="What can become stronger because you are here?" />
-    </section>
-
-    <section className="border-y border-[#17364d]/10 py-12">
-      <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-[#557060]">Seven fields of stewardship</p>
-      <h2 className="mt-3 font-serif text-3xl font-light">Your life is one life.</h2>
-      <div className="mt-8 grid gap-3 md:grid-cols-2 lg:grid-cols-4">{fields.map(([name, text], i) => <article key={name} className="rounded-[22px] border border-[#17364d]/10 bg-white/50 p-5"><span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-[#557060]">0{i + 1} · Building</span><h3 className="mt-5 font-serif text-2xl font-light">{name}</h3><p className="mt-3 text-xs leading-5 text-[#17364d]/55">{text}</p></article>)}</div>
-    </section>
-
+    <section className="grid gap-5 py-10 md:grid-cols-2 lg:grid-cols-4"><Card label="Direction" value={focus ? 'Clear' : 'Developing'} text={focus || 'Begin by noticing where you are.'} /><Card label="Formation" value={`${encounters} encounters`} text="Learning becomes capability through practice and reflection." /><Card label="Reflection" value={`${moments} moments`} text="Noticing creates evidence from which wise action can begin." /><Card label="Next question" value="Contribution" text="What can become stronger because you are here?" /></section>
+    <section className="border-y border-[#17364d]/10 py-12"><p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-[#557060]">Seven fields of stewardship</p><h2 className="mt-3 font-serif text-3xl font-light">Your life is one life.</h2><div className="mt-8 grid gap-3 md:grid-cols-2 lg:grid-cols-4">{fields.map(([name, text], i) => <article key={name} className="rounded-[22px] border border-[#17364d]/10 bg-white/50 p-5"><span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-[#557060]">0{i + 1} · Building</span><h3 className="mt-5 font-serif text-2xl font-light">{name}</h3><p className="mt-3 text-xs leading-5 text-[#17364d]/55">{text}</p></article>)}</div></section>
     <section className="py-12"><div className="grid gap-5 lg:grid-cols-3"><article className="rounded-[28px] bg-[#17364d] p-7 text-white lg:col-span-2"><div className="flex justify-between gap-6"><div><p className="text-[9px] font-semibold uppercase tracking-[0.28em] text-[#d9c78e]">Scripture → practice → evidence</p><h2 className="mt-4 font-serif text-3xl font-light sm:text-4xl">Scripture gives the orientation. Your life provides the evidence.</h2></div><BookOpen size={20} className="text-[#d9c78e]" /></div><p className="mt-5 max-w-2xl text-sm leading-7 text-white/65">BeLoved does not turn commandments into promises about particular outcomes. It helps make faithful practice visible in ordinary life.</p><div className="mt-8 grid gap-3 sm:grid-cols-2">{scripture.map(([a,b]) => <div key={a} className="rounded-2xl border border-white/10 bg-white/5 p-4"><p className="text-sm">{a}</p><p className="mt-1 text-[9px] uppercase tracking-[0.18em] text-[#d9c78e]">{b}</p></div>)}</div></article><div className="space-y-5"><Insight icon={<ShieldCheck size={18}/>} title="No shame" text="A missed commitment becomes information. Repair, reframe, reduce, or recommit."/><Insight icon={<HeartHandshake size={18}/>} title="Contribution" text="Receiving can become capacity that is given back."/><Insight icon={<Scale size={18}/>} title="Discernment" text="BeLoved can surface tradeoffs without pretending to make decisions for you."/></div></div></section>
-
     <section className="border-t border-[#17364d]/10 py-12"><div className="flex items-center justify-between"><div><p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-[#557060]">From person to people</p><h2 className="mt-3 font-serif text-3xl font-light">Your contribution does not stop at you.</h2></div><Users size={20} className="text-[#557060]"/></div><div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">{['Family','Neighbors','Church','Community','City'].map((x,i)=><div key={x} className="rounded-[22px] border border-[#17364d]/10 bg-white/50 p-5"><span className="text-[9px] uppercase tracking-[0.2em] text-[#557060]">0{i+1}</span><p className="mt-4 font-serif text-2xl font-light">{x}</p><p className="mt-3 text-xs leading-5 text-[#17364d]/50">Needs, capacity, stewardship, and contribution become visible here.</p></div>)}</div></section>
-
     <section className="border-t border-[#17364d]/10 py-10"><div className="flex items-center gap-3"><Sparkles size={17} className="text-[#a8863a]"/><p className="text-[9px] font-semibold uppercase tracking-[0.28em] text-[#557060]">Future intelligence</p></div><div className="mt-5 grid gap-6 lg:grid-cols-3"><Future title="Families like ours" text="Compare culture, values, strengths, needs, and aspirations—not status."/><Future title="Cities that align" text="Compare places where your family's contribution could take root after local responsibilities are understood."/><Future title="Decisions together" text="Model building alone, partnering, delaying, investing, giving, or changing direction."/></div></section>
   </>
 }
-
 function Card({label,value,text}:{label:string;value:string;text:string}){return <article className="rounded-[22px] border border-[#17364d]/10 bg-white/55 p-5"><p className="text-[9px] uppercase tracking-[0.22em] text-[#17364d]/40">{label}</p><p className="mt-3 font-serif text-2xl font-light">{value}</p><p className="mt-2 text-xs leading-5 text-[#17364d]/50">{text}</p></article>}
-function Insight({icon,title,text}:{icon:React.ReactNode;title:string;text:string}){return <article className="rounded-[24px] border border-[#17364d]/10 bg-white/60 p-6"><div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#557060]/10 text-[#557060]">{icon}</div><h3 className="mt-5 font-serif text-2xl font-light">{title}</h3><p className="mt-3 text-sm leading-6 text-[#17364d]/55">{text}</p></article>}
+function Insight({icon,title,text}:{icon:ReactNode;title:string;text:string}){return <article className="rounded-[24px] border border-[#17364d]/10 bg-white/60 p-6"><div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#557060]/10 text-[#557060]">{icon}</div><h3 className="mt-5 font-serif text-2xl font-light">{title}</h3><p className="mt-3 text-sm leading-6 text-[#17364d]/55">{text}</p></article>}
 function Future({title,text}:{title:string;text:string}){return <div><p className="font-serif text-2xl font-light">{title}</p><p className="mt-2 text-sm leading-6 text-[#17364d]/55">{text}</p></div>}

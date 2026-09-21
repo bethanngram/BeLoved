@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { ExternalLink, Instagram, Linkedin, Play, RefreshCw, Rss, ShieldCheck, Unplug } from 'lucide-react'
+import { ExternalLink, Instagram, Linkedin, Play, RefreshCw, Rss, ShieldCheck, Unplug, type LucideIcon } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
 type Provider = 'linkedin' | 'instagram' | 'youtube'
@@ -63,7 +63,7 @@ type ProviderStatus = {
   approvalNote: string
 }
 
-const providers: Array<{ id: Provider; label: string; description: string; icon: typeof Linkedin }> = [
+const providers: Array<{ id: Provider; label: string; description: string; icon: LucideIcon }> = [
   { id: 'linkedin', label: 'LinkedIn', description: 'Bring professional presence into your BeLoved life without making BeLoved another social network.', icon: Linkedin },
   { id: 'instagram', label: 'Instagram', description: 'Bring creative work and public posts into your personal thread and community context.', icon: Instagram },
   { id: 'youtube', label: 'YouTube', description: 'Bring your channel and published work into one living record.', icon: Play },
@@ -93,7 +93,7 @@ export default function SocialClient({
   const [rssLabel, setRssLabel] = useState('')
 
   const functionUrl = (name: string, query = '') => {
-    const base = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const base = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://srrstsgqmjulwyqfgmdv.supabase.co'
     return `${base}/functions/v1/${name}${query}`
   }
 
@@ -103,7 +103,7 @@ export default function SocialClient({
     if (!token) throw new Error('Your BeLoved session has expired. Please sign in again.')
     const headers = new Headers(init.headers)
     headers.set('Authorization', `Bearer ${token}`)
-    headers.set('apikey', process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || '')
+    headers.set('apikey', process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_LolpTHZsFbjPR8qNOm0G2Q_1NKp9kb8')
     return fetch(url, { ...init, headers })
   }, [supabase])
 

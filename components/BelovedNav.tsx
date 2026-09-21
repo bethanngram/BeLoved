@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Bell, BookOpen, Compass, HeartHandshake, Home, Landmark, MessageCircle, Network, UserRound, Users } from 'lucide-react'
+import { Bell, BookOpen, Compass, HeartHandshake, Home, Landmark, MessageCircle, Network, Sparkles, UserRound, Users } from 'lucide-react'
 
 const links = [
   { href: '/', label: 'Home', icon: Home },
@@ -18,6 +18,7 @@ const links = [
   { href: '/network', label: 'Connections', icon: Network },
   { href: '/messages', label: 'Messages', icon: MessageCircle },
   { href: '/social', label: 'Community', icon: Bell },
+  { href: '/companion', label: 'Companion', icon: Sparkles },
   { href: '/profile', label: 'Profile', icon: UserRound },
 ]
 

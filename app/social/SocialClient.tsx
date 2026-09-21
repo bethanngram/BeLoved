@@ -83,9 +83,8 @@ export default function SocialClient({
   connectionError: string | null
 }) {
   const supabase = useMemo(() => createClient(), [])
-  const [sources, setSources] = useState(initialSources)
-  const [feed, setFeed] = useState(initialFeed)
   const [connections, setConnections] = useState(initialConnections)
+  const [feed, setFeed] = useState(initialFeed)
   const [statuses, setStatuses] = useState<ProviderStatus[]>([])
   const [busy, setBusy] = useState<string | null>(null)
   const [message, setMessage] = useState(connectionError ? `Connection returned: ${connectionError}` : connected ? `${connected} is connected to BeLoved.` : '')
@@ -162,7 +161,7 @@ export default function SocialClient({
       const payload = await response.json()
       if (!response.ok) throw new Error(payload.error || 'Disconnect failed.')
       setConnections(current => current.filter(connection => connection.provider !== provider))
-      setSources(current => current.filter(source => source.provider !== provider))
+      void initialSources
       setFeed(current => current.filter(item => item.provider !== provider))
       setMessage(`${provider} is disconnected.`)
     } catch (error) {

@@ -213,7 +213,7 @@ export default function SocialClient({
       {message && <div className="mt-6 rounded-2xl border border-[#17364d]/10 bg-white p-4 text-sm">{message}</div>}
 
       <section className="mt-8 grid gap-4 lg:grid-cols-3">
-        {providers.map(({ id, label, description, icon: Icon }) => {
+        {providers.map(({ id, label, description }) => {
           const status = configuredByProvider.get(id)
           const connectedNow = connectedProviders.has(id)
           return (

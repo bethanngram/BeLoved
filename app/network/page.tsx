@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import NetworkClient from './NetworkClient'
 
+export const dynamic = 'force-dynamic'
+
 export default async function NetworkPage() {
   const supabase = await createClient()
   const { data } = await supabase.auth.getClaims()

@@ -4,13 +4,13 @@ import { AGENTS, selectAgents, type AgentResult } from './agents'
 
 export async function buildMemberContext(profileId: string) {
   const supabase = await createClient()
-  const [{ data: profile }, { data: preferences }, { data: moments }, { data: encounters }] = await Promise.all([
-    supabase.from('profiles').select('name,tier,status').eq('id', profileId).maybeSingle(),
-    supabase.from('profile_preferences').select('*').eq('profile_id', profileId).maybeSingle(),
-    supabase.from('journey_moments').select('*').eq('profile_id', profileId).order('opened_at', { ascending: false }).limit(8),
-    supabase.from('formation_encounters').select('*').eq('profile_id', profileId).order('offered_at', { ascending: false }).limit(8),
+  const [{ data: profile }, { data: preferences }, { data: formation }, { data: resources }] = await Promise.all([
+    supabase.from('profiles').select('name,membership_tier,account_status,bio,location_text').eq('id', profileId).maybeSingle(),
+    supabase.from('formation_preferences').select('*').eq('profile_id', profileId).maybeSingle(),
+    supabase.from('formation').select('*').eq('profile_id', profileId).order('updated_at', { ascending: false }).limit(8),
+    supabase.from('formation_resource_journeys').select('*').eq('profile_id', profileId).order('updated_at', { ascending: false }).limit(8),
   ])
-  return { profile, preferences, moments, encounters }
+  return { profile, preferences, formation, resources }
 }
 
 export async function orchestrate(profileId: string, input: string) {

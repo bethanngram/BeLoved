@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Bell, Check, MessageCircle, UserPlus } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
-type Request = { id:string; requester_profile_id:string; addressee_profile_id:string; status:string; note:string|null; created_at:string }
+type Request = { id:string; connection_id:string; requester_profile_id:string; addressee_profile_id:string; status:string; note:string|null; created_at:string }
 type Notice = { id:string; title:string; body:string|null; notification_type:string; read_at:string|null; created_at:string }
 
 export default function NetworkClient(){
@@ -20,7 +20,7 @@ export default function NetworkClient(){
   const {data:user}=await supabase.auth.getUser(); const me=user.user?.id
   if(!me)return
   const [r,n]=await Promise.all([
-   supabase.from('connection_requests').select('id,requester_profile_id,addressee_profile_id,status,note,created_at').or('requester_profile_id.eq.'+me+',addressee_profile_id.eq.'+me).order('created_at',{ascending:false}).limit(30),
+   supabase.from('connection_requests').select('id,connection_id,requester_profile_id,addressee_profile_id,status,note,created_at').or('requester_profile_id.eq.'+me+',addressee_profile_id.eq.'+me).order('created_at',{ascending:false}).limit(30),
    supabase.from('notifications').select('id,title,body,notification_type,read_at,created_at').order('created_at',{ascending:false}).limit(30)
   ])
   setRequests((r.data||[]) as Request[]); setNotices((n.data||[]) as Notice[])
@@ -30,26 +30,21 @@ export default function NetworkClient(){
  async function respond(req:Request,status:'accepted'|'declined'){
   setBusy(req.id); setMessage('')
   const {error}=await supabase.from('connection_requests').update({status,responded_at:new Date().toISOString()}).eq('id',req.id)
-  if(!error && status==='accepted') await supabase.from('member_connections').update({status:'accepted',responded_at:new Date().toISOString()}).eq('id',req.id)
+  if(!error && status==='accepted') await supabase.from('member_connections').update({status:'accepted',responded_at:new Date().toISOString()}).eq('id',req.connection_id)
   setBusy(null); setMessage(error?error.message:'Connection updated.'); await load()
  }
 
  async function openChat(profileId:string){
   const {data:user}=await supabase.auth.getUser(); const me=user.user?.id
   if(!me||me===profileId)return
-  const {data:existing}=await supabase.from('conversations').select('id').eq('context_type','connection').order('created_at',{ascending:false}).limit(20)
-  let id=existing?.[0]?.id
-  if(!id){
-   const created=await supabase.from('conversations').insert({created_by_profile_id:me,subject:'BeLoved connection',context_type:'connection',status:'open'}).select('id').single()
-   if(created.error){setMessage(created.error.message);return} id=created.data.id
-   const participants=await supabase.from('conversation_participants').insert([{conversation_id:id,profile_id:me,status:'active'},{conversation_id:id,profile_id:profileId,status:'active'}])
-   if(participants.error){setMessage(participants.error.message);return}
-  }
+  const created=await supabase.from('conversations').insert({created_by_profile_id:me,subject:'BeLoved connection',context_type:'connection',status:'open'}).select('id').single()
+  if(created.error){setMessage(created.error.message);return}
+  const id=created.data.id
+  const participants=await supabase.from('conversation_participants').insert([{conversation_id:id,profile_id:me,status:'active'},{conversation_id:id,profile_id:profileId,status:'active'}])
+  if(participants.error){setMessage(participants.error.message);return}
   setChatId(id)
-  const {data:msgs}=await supabase.from('messages').select('id,body,sender_profile_id,created_at').eq('conversation_id',id).order('created_at',{ascending:true}).limit(50)
-  setMessages((msgs||[]) as typeof messages)
+  setMessages([])
  }
-
  async function send(){
   if(!chatId||!chatText.trim())return
   const {data:user}=await supabase.auth.getUser(); const me=user.user?.id

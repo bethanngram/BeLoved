@@ -31,3 +31,7 @@ Agents support the member; they do not claim divine authority or replace clergy,
 Supabase is the system of record. GitHub is the source-control and CI/CD home. Optional integrations can include Notion for editorial/knowledge operations, Slack for internal operations, Figma for design-system work, and future media/storage providers for approved image/video/audio assets.
 
 Never place secrets in source control. Use environment variables and server-side secrets for AI/provider credentials.
+
+## Launch
+
+Production launch baseline restored to the last known READY application revision on 2026-09-21; subsequent feature work is preserved on the prelaunch-2026-09-21 branch for controlled reintegration.

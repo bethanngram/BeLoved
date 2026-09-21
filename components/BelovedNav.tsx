@@ -2,11 +2,12 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Bell, BookOpen, Compass, HeartHandshake, Home, MessageCircle, Network, ShieldCheck, Users, WalletCards } from 'lucide-react'
+import { Bell, BookOpen, Compass, HeartHandshake, Home, MessageCircle, Network, ShieldCheck, Sparkles, Users, WalletCards } from 'lucide-react'
 
 const links = [
   { href: '/', label: 'Home', icon: Home },
   { href: '/journey', label: 'Journey', icon: Compass },
+  { href: '/companion', label: 'Companion', icon: Sparkles },
   { href: '/profile', label: 'Profile', icon: Users },
   { href: '/people', label: 'People', icon: Network },
   { href: '/formation', label: 'Formation', icon: BookOpen },

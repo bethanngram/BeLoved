@@ -14,6 +14,7 @@ const links = [
   { href: '/member/money', label: 'Money', icon: Landmark },
   { href: '/member/world', label: 'World', icon: HeartHandshake },
   { href: '/member/trust', label: 'Trust', icon: Network },
+  { href: '/give', label: 'Give', icon: HeartHandshake },
   { href: '/network', label: 'Connections', icon: Network },
   { href: '/messages', label: 'Messages', icon: MessageCircle },
   { href: '/social', label: 'Community', icon: Bell },

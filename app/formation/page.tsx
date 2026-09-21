@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import Link from 'next/link'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
@@ -68,5 +69,5 @@ export default async function FormationPage() {
 }
 
 function Metric({label,value}:{label:string;value:string}){return <div className="rounded-2xl border border-[#17364d]/10 bg-white p-5"><p className="text-[9px] uppercase tracking-[.2em] opacity-40">{label}</p><p className="mt-3 font-serif text-3xl font-light">{value}</p></div>}
-function Panel({title,children}:{title:string;children:React.ReactNode}){return <section className="rounded-[2rem] bg-white p-7"><h2 className="font-serif text-3xl font-light">{title}</h2><div className="mt-5 space-y-3">{children}</div></section>}
+function Panel({title,children}:{title:string;children:ReactNode}){return <section className="rounded-[2rem] bg-white p-7"><h2 className="font-serif text-3xl font-light">{title}</h2><div className="mt-5 space-y-3">{children}</div></section>}
 function Empty({text}:{text:string}){return <p className="rounded-2xl border border-dashed border-[#17364d]/10 p-6 text-sm opacity-50">{text}</p>}

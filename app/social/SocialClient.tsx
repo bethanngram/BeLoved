@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { ExternalLink, Instagram, Linkedin, Play, RefreshCw, Rss, ShieldCheck, Unplug, type LucideIcon } from 'lucide-react'
+import { ExternalLink, RefreshCw, Rss, ShieldCheck, Unplug } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
 type Provider = 'linkedin' | 'instagram' | 'youtube'
@@ -63,10 +63,10 @@ type ProviderStatus = {
   approvalNote: string
 }
 
-const providers: Array<{ id: Provider; label: string; description: string; icon: LucideIcon }> = [
-  { id: 'linkedin', label: 'LinkedIn', description: 'Bring professional presence into your BeLoved life without making BeLoved another social network.', icon: Linkedin },
-  { id: 'instagram', label: 'Instagram', description: 'Bring creative work and public posts into your personal thread and community context.', icon: Instagram },
-  { id: 'youtube', label: 'YouTube', description: 'Bring your channel and published work into one living record.', icon: Play },
+const providers: Array<{ id: Provider; label: string; description: string }> = [
+  { id: 'linkedin', label: 'LinkedIn', description: 'Bring professional presence into your BeLoved life without making BeLoved another social network.' },
+  { id: 'instagram', label: 'Instagram', description: 'Bring creative work and public posts into your personal thread and community context.' },
+  { id: 'youtube', label: 'YouTube', description: 'Bring your channel and published work into one living record.' },
 ]
 
 export default function SocialClient({
@@ -239,7 +239,7 @@ export default function SocialClient({
           return (
             <article key={id} className="rounded-[2rem] bg-white p-6">
               <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3"><Icon size={20} /><h2 className="text-xl font-light">{label}</h2></div>
+                <div className="flex items-center gap-3"><div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#f7f4ed] text-xs font-semibold">{label.slice(0, 1)}</div><h2 className="text-xl font-light">{label}</h2></div>
                 <span className={`rounded-full px-3 py-1 text-[10px] uppercase tracking-[.15em] ${connectedNow ? 'bg-[#e8f0e9]' : status?.configured ? 'bg-[#f3efe4]' : 'bg-[#f7f4ed]'}`}>
                   {connectedNow ? 'Connected' : status?.configured ? 'Ready' : 'Needs setup'}
                 </span>

@@ -24,7 +24,7 @@ export default async function Home() {
   if (!profileId) return <PublicHome />
 
   const [{ data: profile }, { data: directory }, { data: asks }, { data: offers }, { data: listings }, { data: notifications }, { data: connections }, { data: gaps }] = await Promise.all([
-    supabase.from('profiles').select('id,name,bio,location,membership_tier').eq('id', profileId).maybeSingle(),
+    supabase.from('profiles').select('id,name,bio,location_text,membership_tier').eq('id', profileId).maybeSingle(),
     supabase.from('member_directory').select('display_name,city_region,interests,skills,help_offers,professional_capability,availability_status').eq('profile_id', profileId).maybeSingle(),
     supabase.from('asks').select('id,title,category,ask_type,status,created_at').eq('profile_id', profileId).order('created_at', { ascending: false }).limit(4),
     supabase.from('offers').select('id,title,category,offer_type,status,created_at').eq('profile_id', profileId).order('created_at', { ascending: false }).limit(4),
@@ -59,7 +59,7 @@ export default async function Home() {
           </div>
           <div className="rounded-[2rem] bg-[#17364d] p-7 text-[#f7f4ed]">
             <p className="text-[10px] uppercase tracking-[.28em] opacity-45">Your local presence</p>
-            <p className="mt-5 text-3xl font-light">{profile?.location || directory?.city_region || 'Add your place'}</p>
+            <p className="mt-5 text-3xl font-light">{profile?.location_text || directory?.city_region || 'Add your place'}</p>
             <p className="mt-3 text-sm leading-6 opacity-60">{directory?.professional_capability || 'Your capability becomes more useful when people can find it.'}</p>
             <Link href="/people/me" className="mt-6 inline-flex rounded-full border border-white/20 px-4 py-2 text-sm">Build your living profile</Link>
           </div>

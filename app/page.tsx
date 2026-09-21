@@ -18,7 +18,7 @@ export default function Home() {
       <header className="mx-auto flex max-w-7xl items-center justify-between px-6 py-7 lg:px-10">
         <div className="text-2xl font-semibold tracking-[0.18em]">BELOVED</div>
         <nav className="hidden gap-7 text-sm tracking-wide md:flex">
-          <Link href="#explore">Explore</Link><Link href="#formation">Formation</Link><Link href="#journey">The Way Forward</Link><Link href="#community">Community</Link>
+          <Link href="#explore">Explore</Link><Link href="#formation">Formation</Link><Link href="#journey">The Way Forward</Link><Link href="/market">People Market</Link><Link href="#community">Community</Link>
         </nav>
         <div className="flex items-center gap-3"><Link className="hidden rounded-full border border-[#17364d]/20 px-5 py-2 text-sm sm:inline-flex" href="/membership">Membership</Link><Link className="rounded-full border border-[#17364d] px-5 py-2 text-sm" href="/login">Enter BeLoved</Link></div>
       </header>
@@ -28,7 +28,7 @@ export default function Home() {
           <p className="mb-7 text-xs uppercase tracking-[0.35em] opacity-60">A living journey of Christian formation</p>
           <h1 className="max-w-4xl text-6xl font-light leading-[.98] tracking-[-.04em] md:text-8xl">You do not have to fit BeLoved.<br/><em>BeLoved meets you where you are.</em></h1>
           <p className="mt-9 max-w-2xl text-xl font-light leading-8 opacity-80">An intelligent, ecumenical formation ecosystem that grows with you—helping you notice, reflect, learn, love, steward, belong, and serve.</p>
-          <div className="mt-10 flex flex-wrap gap-4"><Link href="/journey" className="rounded-full bg-[#17364d] px-7 py-4 text-sm text-white">Begin your journey</Link><Link href="#explore" className="rounded-full border border-[#17364d]/30 px-7 py-4 text-sm">Explore BeLoved</Link></div>
+          <div className="mt-10 flex flex-wrap gap-4"><Link href="/journey" className="rounded-full bg-[#17364d] px-7 py-4 text-sm text-white">Begin your journey</Link><Link href="/market" className="rounded-full border border-[#17364d]/30 px-7 py-4 text-sm">Enter the People Market</Link><Link href="#explore" className="rounded-full border border-[#17364d]/30 px-7 py-4 text-sm">Explore BeLoved</Link></div>
         </div>
         <div className="flex items-end"><div className="w-full rounded-[2rem] border border-[#17364d]/10 bg-white/55 p-8 shadow-sm"><p className="text-xs uppercase tracking-[.3em] opacity-50">John 17:21</p><p className="mt-8 text-4xl font-light leading-tight">“That they may all be one.”</p><p className="mt-8 leading-7 opacity-70">Unity is not a feature. It is the north star of the experience.</p></div></div>
       </section>

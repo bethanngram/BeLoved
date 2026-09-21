@@ -29,6 +29,10 @@ export default async function MemberDomainPage({ params }: { params: Promise<{ d
   const { data, error } = await supabase.from(config.table).select('*').eq(config.key, profileId).order(config.order, { ascending: false }).limit(24)
   const { data: life } = await supabase.from('life').select('current_season,vision,priorities').eq('profile_id', profileId).maybeSingle()
   const { data: thread } = await supabase.from('personal_thread_entries').select('*').eq('profile_id', profileId).order('created_at', { ascending: false }).limit(6)
+  const { data: asks } = await supabase.from('asks').select('id,title,description,category,urgency,status,visibility').eq('profile_id', profileId).order('updated_at', { ascending: false }).limit(6)
+  const { data: offers } = await supabase.from('offers').select('id,title,description,category,entrustable,status,visibility').eq('profile_id', profileId).order('updated_at', { ascending: false }).limit(6)
+  const { data: listings } = await supabase.from('marketplace_listings').select('id,title,description,category,status,price_cents,location_text').eq('seller_id', profileId).order('updated_at', { ascending: false }).limit(6)
+  const { data: circles } = await supabase.from('member_circle_memberships').select('id,circle_name,member_profile_id').eq('owner_profile_id', profileId).order('created_at', { ascending: false }).limit(12)
 
   return (
     <main className="min-h-screen bg-[#f7f4ed] text-[#17364d]">
@@ -94,9 +98,28 @@ export default async function MemberDomainPage({ params }: { params: Promise<{ d
             <Link href="/journey" className="mt-6 inline-flex rounded-full bg-[#17364d] px-5 py-3 text-sm text-white">Return to Becoming</Link>
           </aside>
         </section>
+
+        {domain === 'people' && (
+          <section className="mt-8 rounded-[2rem] border border-[#17364d]/10 bg-white/60 p-7">
+            <div className="flex items-end justify-between gap-4">
+              <div><p className="text-[9px] uppercase tracking-[.28em] text-[#557060]">Shared Resources</p><h2 className="mt-2 font-serif text-3xl font-light">What we have is sometimes meant to be shared.</h2><p className="mt-3 max-w-2xl text-sm leading-6 opacity-55">Asks, offers, circles, and marketplace resources belong inside relationship—not beside it.</p></div>
+              <Link href="/hey-neighbor" className="hidden rounded-full bg-[#17364d] px-5 py-3 text-sm text-white sm:inline-flex">See community needs</Link>
+            </div>
+            <div className="mt-6 grid gap-4 lg:grid-cols-4">
+              <ResourceCard title="Asks" count={asks?.length || 0} items={(asks || []).map(x => x.title).slice(0,3)} href="/hey-neighbor" />
+              <ResourceCard title="Offers" count={offers?.length || 0} items={(offers || []).map(x => x.title).slice(0,3)} href="/member/people" />
+              <ResourceCard title="Resources" count={listings?.length || 0} items={(listings || []).map(x => x.title).slice(0,3)} href="/market" />
+              <ResourceCard title="Circles" count={circles?.length || 0} items={(circles || []).map(x => x.circle_name).filter(Boolean).slice(0,3)} href="/network" />
+            </div>
+          </section>
+        )}
       </div>
     </main>
   )
+}
+
+function ResourceCard({ title, count, items, href }: { title: string; count: number; items: string[]; href: string }) {
+  return <Link href={href} className="rounded-2xl bg-[#f7f4ed] p-5 transition hover:bg-white"><div className="flex items-center justify-between"><h3 className="text-lg font-light">{title}</h3><span className="font-serif text-2xl">{count}</span></div><div className="mt-4 space-y-2">{items.length ? items.map((item, index) => <p key={item + index} className="truncate text-xs opacity-55">{item}</p>) : <p className="text-xs opacity-40">Nothing here yet.</p>}</div></Link>
 }
 
 function Stat({ label, value }: { label: string; value: string }) {

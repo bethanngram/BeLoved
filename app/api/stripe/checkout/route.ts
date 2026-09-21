@@ -37,7 +37,7 @@ export async function POST(request: Request) {
       customerForm.set('metadata[supabase_profile_id]', profileId)
       const customer = await stripeRequest('/customers', secretKey, customerForm)
       customerId = customer.id as string
-      await supabase.from('payment_accounts').upsert({ profile_id: profileId, stripe_customer_id: customerId, account_type: 'customer', status: 'active', metadata: { source: 'beloved_membership_checkout' }, updated_at: new Date().toISOString() }, { onConflict: 'profile_id' })
+      await supabase.from('payment_accounts').upsert({ profile_id: profileId, stripe_customer_id: customerId, account_type: 'customer', status: 'active', metadata: { source: 'beloved_membership_checkout' }, updated_at: new Date().toISOString() }, { onConflict: 'profile_id,account_type' })
     }
 
     const origin = process.env.NEXT_PUBLIC_SITE_URL || new URL(request.url).origin

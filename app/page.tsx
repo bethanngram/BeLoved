@@ -20,7 +20,7 @@ export default function Home() {
         <nav className="hidden gap-7 text-sm tracking-wide md:flex">
           <Link href="#explore">Explore</Link><Link href="#formation">Formation</Link><Link href="#journey">The Way Forward</Link><Link href="#community">Community</Link>
         </nav>
-        <Link className="rounded-full border border-[#17364d] px-5 py-2 text-sm" href="/login">Enter BeLoved</Link>
+        <div className="flex items-center gap-3"><Link className="hidden rounded-full border border-[#17364d]/20 px-5 py-2 text-sm sm:inline-flex" href="/membership">Membership</Link><Link className="rounded-full border border-[#17364d] px-5 py-2 text-sm" href="/login">Enter BeLoved</Link></div>
       </header>
 
       <section className="mx-auto grid max-w-7xl gap-12 px-6 pb-24 pt-16 lg:grid-cols-[1.15fr_.85fr] lg:px-10 lg:pt-28">

@@ -70,13 +70,11 @@ const providers: Array<{ id: Provider; label: string; description: string }> = [
 ]
 
 export default function SocialClient({
-  initialSources,
   initialFeed,
   initialConnections,
   connected,
   connectionError,
 }: {
-  initialSources: Source[]
   initialFeed: FeedItem[]
   initialConnections: Connection[]
   connected: string | null
@@ -161,7 +159,6 @@ export default function SocialClient({
       const payload = await response.json()
       if (!response.ok) throw new Error(payload.error || 'Disconnect failed.')
       setConnections(current => current.filter(connection => connection.provider !== provider))
-      void initialSources
       setFeed(current => current.filter(item => item.provider !== provider))
       setMessage(`${provider} is disconnected.`)
     } catch (error) {

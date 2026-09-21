@@ -44,7 +44,15 @@ export default function MarketClient() {
 
   const filteredPeople = people.filter(person => {
     const text = [person.display_name, person.city_region, person.bio, person.professional_capability, ...(person.skills || []), ...(person.help_offers || []), ...(person.interests || [])].filter(Boolean).join(' ').toLowerCase()
-    return !query || text.includes(query.toLowerCase())
+    const matchesSearch = !query || text.includes(query.toLowerCase())
+    const matchesAction = active === 'All' || (
+      active === 'Connect' ? true :
+      active === 'Help' ? Boolean(person.help_offers?.length || person.accepts_asks) :
+      active === 'Hire' ? Boolean(person.professional_capability || person.skills?.length) :
+      active === 'Learn' ? Boolean(person.skills?.length || person.professional_capability) :
+      true
+    )
+    return matchesSearch && matchesAction
   })
 
   async function createPost(event: FormEvent) {

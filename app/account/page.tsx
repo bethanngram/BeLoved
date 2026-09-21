@@ -19,7 +19,7 @@ export default async function AccountPage() {
   const id = String(auth.claims.sub)
   const [{ data: profile }, { data: account }] = await Promise.all([
     supabase.from('profiles').select('name,email,membership_tier,account_status').eq('id', id).maybeSingle(),
-    supabase.from('payment_accounts').select('stripe_customer_id,status,account_type,updated_at').eq('profile_id', id).maybeSingle(),
+    supabase.from('payment_accounts').select('stripe_customer_id,status,account_type,updated_at').eq('profile_id', id).eq('account_type', 'customer').maybeSingle(),
   ])
 
   return <main className="min-h-screen bg-[#f7f4ed] text-[#17364d]"><BelovedHeader /><div className="mx-auto max-w-4xl px-4 pb-24 sm:px-6 lg:px-8">

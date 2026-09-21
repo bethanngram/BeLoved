@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { BelovedHeader } from '@/components/BelovedHeader'
@@ -14,6 +15,42 @@ const domains = {
 } as const
 
 type Domain = keyof typeof domains
+
+
+async function recordTrustEvidence(formData: FormData) {
+  'use server'
+  const supabase = await createClient()
+  const { data: auth } = await supabase.auth.getClaims()
+  const actor = auth?.claims?.sub ? String(auth.claims.sub) : null
+  if (!actor) redirect('/login')
+
+  const target = String(formData.get('target_person_id') ?? '')
+  const trustLevel = String(formData.get('trust_level') ?? 'known')
+  const note = String(formData.get('note') ?? '').trim()
+  if (!target) redirect('/member/trust')
+
+  await supabase.from('trust_actions').insert({
+    actor_profile_id: actor,
+    target_person_id: target,
+    action_type: trustLevel,
+    status: 'completed',
+    note: note || null,
+    metadata: { source: 'member_trust' },
+  })
+
+  await supabase.from('relationship_edges').upsert({
+    source_profile_id: actor,
+    target_person_id: target,
+    relationship_type: 'relationship',
+    trust_level: trustLevel,
+    strength: trustLevel === 'known' ? 'new' : trustLevel === 'met' ? 'developing' : 'strong',
+    evidence_count: 1,
+    updated_at: new Date().toISOString(),
+  })
+
+  revalidatePath('/member/trust')
+  redirect('/member/trust')
+}
 
 export const dynamic = 'force-dynamic'
 
@@ -36,6 +73,7 @@ export default async function MemberDomainPage({ params }: { params: Promise<{ d
   const { data: worldGaps } = await supabase.from('world_response_gaps').select('*').order('unmet_quantity', { ascending: false }).limit(6)
   const { data: worldNeeds } = await supabase.from('world_need_signals').select('*').order('observed_at', { ascending: false }).limit(6)
   const { data: worldCapacity } = await supabase.from('world_capacity_signals').select('*').order('observed_at', { ascending: false }).limit(6)
+  const { data: trustPeople } = await supabase.from('people').select('id,name').eq('user_id', profileId).order('updated_at', { ascending: false }).limit(30)
 
   return (
     <main className="min-h-screen bg-[#f7f4ed] text-[#17364d]">
@@ -101,6 +139,34 @@ export default async function MemberDomainPage({ params }: { params: Promise<{ d
             <Link href="/journey" className="mt-6 inline-flex rounded-full bg-[#17364d] px-5 py-3 text-sm text-white">Return to Becoming</Link>
           </aside>
         </section>
+
+        {domain === 'trust' && (
+          <section className="mt-8 rounded-[2rem] bg-white p-7">
+            <p className="text-[9px] uppercase tracking-[.28em] text-[#557060]">Trust evidence</p>
+            <h2 className="mt-2 font-serif text-3xl font-light">Trust grows through lived evidence.</h2>
+            <p className="mt-3 max-w-2xl text-sm leading-6 opacity-55">Record what is actually true about a relationship. BeLoved keeps the evidence close to the relationship rather than turning trust into a score.</p>
+            <div className="mt-6 grid gap-3 md:grid-cols-2">
+              {(trustPeople || []).map((person) => (
+                <form key={person.id} action={recordTrustEvidence} className="rounded-2xl bg-[#f7f4ed] p-5">
+                  <p className="font-medium">{person.name}</p>
+                  <input type="hidden" name="target_person_id" value={person.id} />
+                  <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                    <select name="trust_level" defaultValue="known" className="rounded-xl border border-[#17364d]/10 bg-white px-3 py-2 text-sm">
+                      <option value="known">Known</option>
+                      <option value="met">Met</option>
+                      <option value="shared">Shared</option>
+                      <option value="trusted">Trusted</option>
+                      <option value="invested">Invested</option>
+                    </select>
+                    <input name="note" placeholder="Evidence or context" className="rounded-xl border border-[#17364d]/10 bg-white px-3 py-2 text-sm" />
+                  </div>
+                  <button className="mt-3 rounded-full bg-[#17364d] px-4 py-2 text-xs text-white">Record evidence</button>
+                </form>
+              ))}
+              {!trustPeople?.length && <p className="rounded-2xl border border-dashed border-[#17364d]/10 p-6 text-sm opacity-50 md:col-span-2">Add people to your relationship record before recording trust evidence.</p>}
+            </div>
+          </section>
+        )}
 
         {domain === 'world' && (
           <section className="mt-8 rounded-[2rem] bg-[#17364d] p-7 text-[#f7f4ed]">

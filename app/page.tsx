@@ -61,7 +61,7 @@ export default async function Home() {
             <p className="text-[10px] uppercase tracking-[.28em] opacity-45">Your local presence</p>
             <p className="mt-5 text-3xl font-light">{profile?.location_text || directory?.city_region || 'Add your place'}</p>
             <p className="mt-3 text-sm leading-6 opacity-60">{directory?.professional_capability || 'Your capability becomes more useful when people can find it.'}</p>
-            <Link href="/people/me" className="mt-6 inline-flex rounded-full border border-white/20 px-4 py-2 text-sm">Build your living profile</Link>
+            <Link href="/profile" className="mt-6 inline-flex rounded-full border border-white/20 px-4 py-2 text-sm">Build your living profile</Link>
           </div>
         </section>
 

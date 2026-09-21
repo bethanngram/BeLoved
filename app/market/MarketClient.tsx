@@ -4,7 +4,19 @@ import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { ArrowRight, HandHeart, HeartHandshake, MapPin, Plus, Search, Sparkles, Store, Users } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
-type Person = { profile_id: string; display_name: string | null; photo_url: string | null; city_region: string | null; interests: string[]; skills: string[]; help_offers: string[]; bio: string | null; professional_capability: string | null }
+type Person = {
+  profile_id: string
+  display_name: string | null
+  photo_url: string | null
+  city_region: string | null
+  interests: string[]
+  skills: string[]
+  help_offers: string[]
+  bio: string | null
+  accepts_asks: boolean
+  availability_status: string | null
+  professional_capability: string | null
+}
 type Offer = { id: string; profile_id: string; title: string; description: string | null; category: string | null; offer_type: string; status: string }
 type Ask = { id: string; profile_id: string; title: string; description: string | null; category: string; urgency: string; visibility: string }
 type Listing = { id: string; seller_id: string; title: string; description: string | null; category: string; price_cents: number | null; location_text: string | null; image_url: string | null; status: string }
@@ -32,8 +44,14 @@ export default function MarketClient() {
       supabase.from('member_directory').select('profile_id,display_name,photo_url,city_region,interests,skills,help_offers,bio,accepts_asks,availability_status,professional_capability').eq('discoverable', true).limit(60),
       supabase.from('offers').select('id,profile_id,title,description,category,offer_type,status').eq('status', 'available').limit(60),
       supabase.from('asks').select('id,profile_id,title,description,category,urgency,visibility').eq('status', 'open').limit(60),
-      supabase.from('marketplace_listings').select('id,seller_id,title,description,category,price_cents,location_text,image_url,status').neq('status', 'removed').limit(60)
+      supabase.from('marketplace_listings').select('id,seller_id,title,description,category,price_cents,location_text,image_url,status').eq('status', 'available').limit(60),
     ])
+
+    if (results[0].error || results[1].error || results[2].error || results[3].error) {
+      const firstError = [results[0].error, results[1].error, results[2].error, results[3].error].find(Boolean)
+      setMessage(firstError?.message || 'Unable to load the People Market right now.')
+    }
+
     setPeople((results[0].data || []) as Person[])
     setOffers((results[1].data || []) as Offer[])
     setAsks((results[2].data || []) as Ask[])
@@ -62,10 +80,12 @@ export default function MarketClient() {
     const { data } = await supabase.auth.getUser()
     const profileId = data.user?.id
     if (!profileId) { setMessage('Please sign in again.'); setBusy(null); return }
+
     const table = composerType === 'offer' ? 'offers' : 'asks'
     const payload = composerType === 'offer'
-      ? { profile_id: profileId, title, description, category, offer_type: 'capability', status: 'available', visibility: 'network' }
-      : { profile_id: profileId, title, description, category, ask_type: 'need', urgency: 'normal', status: 'open', visibility: 'network' }
+      ? { profile_id: profileId, title: title.trim(), description: description.trim() || null, category: category.trim() || 'community', offer_type: 'capability', status: 'available', visibility: 'network' }
+      : { profile_id: profileId, title: title.trim(), description: description.trim() || null, category: category.trim() || 'other', ask_type: 'need', urgency: 'normal', status: 'open', visibility: 'network' }
+
     const { error } = await supabase.from(table).insert(payload)
     setBusy(null)
     if (error) { setMessage(error.message); return }
@@ -79,15 +99,31 @@ export default function MarketClient() {
     const { data } = await supabase.auth.getUser()
     const me = data.user?.id
     if (!me || me === profileId) { setBusy(null); return }
+
     const filter = 'and(requester_profile_id.eq.' + me + ',addressee_profile_id.eq.' + profileId + '),and(requester_profile_id.eq.' + profileId + ',addressee_profile_id.eq.' + me + ')'
-    const { data: existing } = await supabase.from('member_connections').select('id,status').or(filter).maybeSingle()
+    const { data: existing, error: existingError } = await supabase.from('member_connections').select('id,status').or(filter).maybeSingle()
+    if (existingError) { setMessage(existingError.message); setBusy(null); return }
+
     let connectionId = existing?.id
+    if (existing?.status === 'accepted') { setMessage('You are already connected.'); setBusy(null); return }
+
     if (!connectionId) {
       const { data: connection, error } = await supabase.from('member_connections').insert({ requester_profile_id: me, addressee_profile_id: profileId, status: 'requested' }).select('id').single()
       if (error) { setMessage(error.message); setBusy(null); return }
       connectionId = connection.id
     }
-    const { error } = await supabase.from('connection_requests').insert({ connection_id: connectionId, requester_profile_id: me, addressee_profile_id: profileId, status: 'pending', note: 'I found you through the BeLoved People Market.' })
+
+    const { data: pending } = await supabase.from('connection_requests').select('id').eq('connection_id', connectionId).eq('status', 'pending').maybeSingle()
+    if (pending) { setMessage('A connection request is already pending.'); setBusy(null); return }
+
+    const { error } = await supabase.from('connection_requests').insert({
+      connection_id: connectionId,
+      requester_profile_id: me,
+      addressee_profile_id: profileId,
+      status: 'pending',
+      note: 'I found you through the BeLoved People Market.',
+    })
+
     setBusy(null)
     setMessage(error ? error.message : 'Connection request sent.')
   }
@@ -97,9 +133,27 @@ export default function MarketClient() {
     const { data } = await supabase.auth.getUser()
     const me = data.user?.id
     if (!me || me === ask.profile_id) { setBusy(null); return }
-    const created = await supabase.from('fulfillment_cases').insert({ profile_id: ask.profile_id, ask_id: ask.id, title: ask.title, description: ask.description, visibility: 'member', status: 'open', priority: ask.urgency === 'high' ? 'high' : 'normal' }).select('id').single()
+
+    const created = await supabase.from('fulfillment_cases').insert({
+      profile_id: ask.profile_id,
+      ask_id: ask.id,
+      title: ask.title,
+      description: ask.description,
+      visibility: 'member',
+      status: 'open',
+      priority: ask.urgency === 'high' ? 'high' : 'normal',
+    }).select('id').single()
+
     if (created.error) { setMessage(created.error.message); setBusy(null); return }
-    const matched = await supabase.from('fulfillment_matches').insert({ case_id: created.data.id, requester_profile_id: ask.profile_id, helper_profile_id: me, status: 'proposed', match_basis: { source: 'people_market', action: 'help' } })
+
+    const matched = await supabase.from('fulfillment_matches').insert({
+      case_id: created.data.id,
+      requester_profile_id: ask.profile_id,
+      helper_profile_id: me,
+      status: 'proposed',
+      match_basis: { source: 'people_market', action: 'help' },
+    })
+
     setBusy(null)
     setMessage(matched.error ? matched.error.message : 'You stepped forward. The request now has a fulfillment match.')
   }
@@ -109,9 +163,28 @@ export default function MarketClient() {
     const { data } = await supabase.auth.getUser()
     const me = data.user?.id
     if (!me || me === offer.profile_id) { setBusy(null); return }
-    const created = await supabase.from('fulfillment_cases').insert({ profile_id: me, title: offer.title, description: offer.description, visibility: 'member', status: 'open', priority: 'normal', metadata: { source: 'people_market', offer_id: offer.id } }).select('id').single()
+
+    const created = await supabase.from('fulfillment_cases').insert({
+      profile_id: me,
+      title: offer.title,
+      description: offer.description,
+      visibility: 'member',
+      status: 'open',
+      priority: 'normal',
+      metadata: { source: 'people_market', offer_id: offer.id },
+    }).select('id').single()
+
     if (created.error) { setMessage(created.error.message); setBusy(null); return }
-    const matched = await supabase.from('fulfillment_matches').insert({ case_id: created.data.id, requester_profile_id: me, helper_profile_id: offer.profile_id, offer_id: offer.id, status: 'proposed', match_basis: { source: 'people_market', action: 'hire_or_learn' } })
+
+    const matched = await supabase.from('fulfillment_matches').insert({
+      case_id: created.data.id,
+      requester_profile_id: me,
+      helper_profile_id: offer.profile_id,
+      offer_id: offer.id,
+      status: 'proposed',
+      match_basis: { source: 'people_market', action: 'hire_or_learn' },
+    })
+
     setBusy(null)
     setMessage(matched.error ? matched.error.message : 'Interest sent. The capability is now connected to a fulfillment case.')
   }

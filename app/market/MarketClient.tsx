@@ -51,13 +51,33 @@ export default function MarketClient(){
   async function publish(){
     if(!me||!title.trim())return
     setBusy(true);setMessage('')
-    const payload=kind==='offer'
-      ? {profile_id:me,title:title.trim(),description:description.trim()||null,category:category.trim()||'community',offer_type:active==='All'?'Connect':active,status:'open',visibility:'community',metadata:{source:'people_market',action:active}}
-      : {profile_id:me,title:title.trim(),description:description.trim()||null,category:category.trim()||'community',ask_type:active==='All'?'Help':active,urgency:'normal',status:'open',visibility:'community',metadata:{source:'people_market',action:active}}
-    const result = kind === 'offer'
-      ? await supabase.from('offers').insert(payload as never)
-      : await supabase.from('asks').insert(payload as never)
-    const { error } = result
+    let error = null
+    if (kind === 'offer') {
+      const result = await supabase.from('offers').insert({
+        profile_id: me,
+        title: title.trim(),
+        description: description.trim() || null,
+        category: category.trim() || 'community',
+        offer_type: active === 'All' ? 'Connect' : active,
+        status: 'open',
+        visibility: 'community',
+        metadata: { source: 'people_market', action: active },
+      })
+      error = result.error
+    } else {
+      const result = await supabase.from('asks').insert({
+        profile_id: me,
+        title: title.trim(),
+        description: description.trim() || null,
+        category: category.trim() || 'community',
+        ask_type: active === 'All' ? 'Help' : active,
+        urgency: 'normal',
+        status: 'open',
+        visibility: 'community',
+        metadata: { source: 'people_market', action: active },
+      })
+      error = result.error
+    }
     if(error)setMessage(error.message);else{setTitle('');setDescription('');setCategory('');setComposer(false);setMessage('Published to the People Market.');await load()}
     setBusy(false)
   }

@@ -33,6 +33,9 @@ export default async function MemberDomainPage({ params }: { params: Promise<{ d
   const { data: offers } = await supabase.from('offers').select('id,title,description,category,entrustable,status,visibility').eq('profile_id', profileId).order('updated_at', { ascending: false }).limit(6)
   const { data: listings } = await supabase.from('marketplace_listings').select('id,title,description,category,status,price_cents,location_text').eq('seller_id', profileId).order('updated_at', { ascending: false }).limit(6)
   const { data: circles } = await supabase.from('member_circle_memberships').select('id,circle_name,member_profile_id').eq('owner_profile_id', profileId).order('created_at', { ascending: false }).limit(12)
+  const { data: worldGaps } = await supabase.from('world_response_gaps').select('*').order('unmet_quantity', { ascending: false }).limit(6)
+  const { data: worldNeeds } = await supabase.from('world_need_signals').select('*').order('observed_at', { ascending: false }).limit(6)
+  const { data: worldCapacity } = await supabase.from('world_capacity_signals').select('*').order('observed_at', { ascending: false }).limit(6)
 
   return (
     <main className="min-h-screen bg-[#f7f4ed] text-[#17364d]">
@@ -99,7 +102,24 @@ export default async function MemberDomainPage({ params }: { params: Promise<{ d
           </aside>
         </section>
 
-        {domain === 'people' && (
+        {domain === 'world' && (
+          <section className="mt-8 rounded-[2rem] bg-[#17364d] p-7 text-[#f7f4ed]">
+            <p className="text-[9px] uppercase tracking-[.28em] opacity-45">World response</p>
+            <h2 className="mt-2 font-serif text-3xl font-light">Need, capacity, response, impact.</h2>
+            <p className="mt-3 max-w-2xl text-sm leading-6 opacity-55">BeLoved will only surface verified signals. Where the data is incomplete, the experience stays honest.</p>
+            <div className="mt-6 grid gap-4 md:grid-cols-3">
+              <WorldSignal title="Needs" count={worldNeeds?.length || 0} />
+              <WorldSignal title="Capacity" count={worldCapacity?.length || 0} />
+              <WorldSignal title="Response gaps" count={worldGaps?.length || 0} />
+            </div>
+            <div className="mt-5 space-y-2">
+              {(worldGaps || []).slice(0, 4).map((gap: Record<string, unknown>, index: number) => <div key={String(gap.id || index)} className="rounded-2xl border border-white/10 bg-white/5 p-4"><div className="flex justify-between gap-4 text-sm"><span>{String(gap.need_code || gap.need_dimension || 'Response gap')}</span><span className="opacity-45">{String(gap.geography_key || '')}</span></div><p className="mt-1 text-xs opacity-45">{String(gap.coverage_status || 'Verified response signal')}</p></div>)}
+              {!worldGaps?.length && <p className="rounded-2xl border border-white/10 p-4 text-sm opacity-50">No verified response gaps are available yet.</p>}
+            </div>
+          </section>
+        )}
+
+                {domain === 'people' && (
           <section className="mt-8 rounded-[2rem] border border-[#17364d]/10 bg-white/60 p-7">
             <div className="flex items-end justify-between gap-4">
               <div><p className="text-[9px] uppercase tracking-[.28em] text-[#557060]">Shared Resources</p><h2 className="mt-2 font-serif text-3xl font-light">What we have is sometimes meant to be shared.</h2><p className="mt-3 max-w-2xl text-sm leading-6 opacity-55">Asks, offers, circles, and marketplace resources belong inside relationship—not beside it.</p></div>
@@ -117,6 +137,8 @@ export default async function MemberDomainPage({ params }: { params: Promise<{ d
     </main>
   )
 }
+
+function WorldSignal({ title, count }: { title: string; count: number }) { return <div className="rounded-2xl bg-white/5 p-5"><p className="text-[9px] uppercase tracking-[.2em] opacity-40">{title}</p><p className="mt-2 font-serif text-3xl font-light">{count}</p></div> }
 
 function ResourceCard({ title, count, items, href }: { title: string; count: number; items: string[]; href: string }) {
   return <Link href={href} className="rounded-2xl bg-[#f7f4ed] p-5 transition hover:bg-white"><div className="flex items-center justify-between"><h3 className="text-lg font-light">{title}</h3><span className="font-serif text-2xl">{count}</span></div><div className="mt-4 space-y-2">{items.length ? items.map((item, index) => <p key={item + index} className="truncate text-xs opacity-55">{item}</p>) : <p className="text-xs opacity-40">Nothing here yet.</p>}</div></Link>

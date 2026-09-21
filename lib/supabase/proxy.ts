@@ -1,27 +1,32 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+const SUPABASE_URL =
+  process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://srrstsgqmjulwyqfgmdv.supabase.co'
+
+const SUPABASE_KEY =
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_LolpTHZsFbjPR8qNOm0G2Q_1NKp9kb8'
+
 export async function updateSession(request: NextRequest) {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
-
-  // Keep the public site renderable while environment variables are being
-  // configured in the deployment platform. Authentication becomes active
-  // automatically as soon as both values are present.
-  if (!url || !key) {
-    return NextResponse.next()
-  }
-
   let response = NextResponse.next({ request })
 
-  const supabase = createServerClient(url, key, {
+  const supabase = createServerClient(SUPABASE_URL, SUPABASE_KEY, {
     cookies: {
       getAll: () => request.cookies.getAll(),
       setAll(cookiesToSet, headers) {
-        cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+        cookiesToSet.forEach(({ name, value }) =>
+          request.cookies.set(name, value)
+        )
+
         response = NextResponse.next({ request })
-        cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options))
-        Object.entries(headers).forEach(([header, value]) => response.headers.set(header, value))
+
+        cookiesToSet.forEach(({ name, value, options }) =>
+          response.cookies.set(name, value, options)
+        )
+
+        Object.entries(headers).forEach(([header, value]) =>
+          response.headers.set(header, value)
+        )
       },
     },
   })

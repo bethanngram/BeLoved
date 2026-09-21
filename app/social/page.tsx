@@ -42,7 +42,6 @@ export default async function SocialPage({
     <main className="min-h-screen bg-[#f7f4ed] text-[#17364d]">
       <BelovedHeader />
       <SocialClient
-        initialSources={sources || []}
         initialFeed={feed || []}
         initialConnections={connections || []}
         connected={connected}

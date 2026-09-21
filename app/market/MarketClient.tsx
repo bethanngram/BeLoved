@@ -1,6 +1,6 @@
 'use client'
 
-import { FormEvent, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { ArrowRight, HandHeart, HeartHandshake, MapPin, Plus, Search, Sparkles, Store, Users } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 

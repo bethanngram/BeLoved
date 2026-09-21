@@ -93,7 +93,7 @@ export default async function MemberDomainPage({ params }: { params: Promise<{ d
               {(thread || []).slice(0, 4).map((entry: Record<string, unknown>, index: number) => (
                 <div key={String(entry.id || index)} className="rounded-2xl bg-white p-4">
                   <p className="text-sm">{String(entry.title || entry.content || 'A thread entry')}</p>
-                  {entry.created_at && <p className="mt-1 text-[10px] opacity-35">{new Date(String(entry.created_at)).toLocaleDateString()}</p>}
+                  {Boolean(entry.created_at) && <p className="mt-1 text-[10px] opacity-35">{new Date(String(entry.created_at)).toLocaleDateString()}</p>}
                 </div>
               ))}
               {!thread?.length && <p className="rounded-2xl bg-white p-4 text-sm leading-6 opacity-50">Your thread will begin with real moments, not manufactured engagement.</p>}

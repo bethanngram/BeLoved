@@ -15,12 +15,7 @@ export default async function SocialPage({
   const profileId = claims?.claims?.sub ? String(claims.claims.sub) : null
   if (!profileId) redirect('/login')
 
-  const [{ data: sources }, { data: feed }, { data: connections }] = await Promise.all([
-    supabase
-      .from('social_sources')
-      .select('id,provider,source_type,label,feed_url,external_account_id,external_handle,status,visibility,last_synced_at,next_sync_at,error_message,metadata')
-      .eq('profile_id', profileId)
-      .order('updated_at', { ascending: false }),
+  const [{ data: feed }, { data: connections }] = await Promise.all([
     supabase
       .from('social_feed_items')
       .select('id,source_id,provider,external_id,external_url,author_name,author_handle,author_avatar_url,title,body,excerpt,image_url,content_type,published_at,fetched_at,visibility')

@@ -6,22 +6,6 @@ import { createClient } from '@/lib/supabase/client'
 
 type Provider = 'linkedin' | 'instagram' | 'youtube'
 
-type Source = {
-  id: string
-  provider: string
-  source_type: string
-  label: string | null
-  feed_url: string | null
-  external_account_id: string | null
-  external_handle: string | null
-  status: string
-  visibility: string
-  last_synced_at: string | null
-  next_sync_at: string | null
-  error_message: string | null
-  metadata?: Record<string, unknown>
-}
-
 type FeedItem = {
   id: string
   source_id: string | null
